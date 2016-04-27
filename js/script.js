@@ -6,16 +6,35 @@ function loadData() {
    var $nytElem = $('#nytimes-articles');
    var $greeting = $('#greeting');
 
-   var street = $('#street').val();
-   var city = $('#city').val();
-   var url = 'https://maps.googleapis.com/maps/api/streetview?size=600x300&location=' + street + ', ' + city;
-   
    // clear out old data before new request
    $wikiElem.text("");
    $nytElem.text("");
-   // load streetview
 
-   $body.append('<img class="bgimg" src='+url.replace(/ /g, '')+'></img>');
+   var streetStr = $('#street').val();
+   var cityStr = $('#city').val();
+   var address = streetStr + ', ' + cityStr;
+
+   $greeting.text('So, you want to live at ' + address + '?');
+
+
+   // load streetview
+   var streetviewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=600x400&location=' + address + '';
+   $body.append('<img class="bgimg" src="' + streetviewUrl + '">');
+
+   var nyt_url = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+cityStr+'&api-key=8b3ce9f97f4f17cba58bd0d3bb8b7a3f:19:75136192';
+
+   // load nytimes
+   $.getJSON(nyt_url,function(data){
+
+     $nytElem.text('New York Times Articles About ' + cityStr);
+
+     articles = data.response.docs;
+     for (var i = 0; i < articles.length; i++) {
+       var article = articles[i];
+       $nytElem.append('<li class="article">' + '<a href="'+article.web_url+'">' + article.headline.main+'</a>' + '<p>' + article.snippet + '</p>' + '</li>');
+     }
+
+   });
 
    // YOUR CODE GOES HERE!
 
